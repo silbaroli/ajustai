@@ -1,0 +1,13 @@
+name: sobrevida
+title: sobrevida
+username: silbaroli
+account: silbaroli
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13137127
+bundleId: 10382781
+url: https://silbaroli.shinyapps.io/sobrevida/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|app_19May2025.R|app_bkp28may2025.R|app_v2.R|content/IPD_OS_ANA.csv|content/OS_anastrozol.csv|content/PCR_Negativo.csv|content/test.csv|matriz_chol_os_ana.csv|Modelos_Ajuste_os_ana.csv|Modelos_parametros_os_ana.csv|theme.R|www/logo.jpg
