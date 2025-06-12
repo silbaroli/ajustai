@@ -10,16 +10,11 @@ library(shinyBS)
 library(shinyFeedback)
 library(rintrojs)
 library(fresh)
-
 library(IPDfromKM)
 library(flexsurv)
-
 library(DT)
 library(tidyverse)
 library(plotly)
-
-
-#source("/home/urstudio/Pessoal/Ivan/theme.R")
 
 mytheme <- create_theme(
   adminlte_color(
