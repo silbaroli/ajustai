@@ -66,7 +66,9 @@ ui <- dashboardPage(skin = "black",
             .navbar-default .navbar-nav > li > a:hover {color:white;background-color:#1F3161;text-decoration}
             .btn-lang {color: #263238;background-color: white;border-color: white;}
             .plots-title{margin-left: 30px; margin-right: 30px; text-align: center}
-            
+            .panel-default {border: none !important;box-shadow: none !important;}
+            .panel-default > .panel-heading {background-color: transparent !important;border: none !important;padding-left: 0;font-weight: bold;font-size: 16px;}
+            .panel-default > .panel-collapse > .panel-body {border: none !important;background-color: transparent !important;padding-left: 0;}
             "
           ))),
           tags$head(
@@ -79,43 +81,54 @@ ui <- dashboardPage(skin = "black",
             tags$script(src = "https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js")
           ),
           fluidRow(
-            style = "background-color: #15385A; height: 60px; display: flex; justify-content: flex-end; align-items: center; padding-right: 0px;",
-            actionButton(
-              inputId = "help",
-              label = icon("info-circle", class = "fa-2x"),
-              style = "background: transparent; border: none; color: #ffffff; cursor: pointer;"
-            )
+            style = "background-color: #00205C; height: 60px; display: flex; justify-content: flex-end; align-items: center; padding-right: 0px;",
+            # actionButton(
+            #   inputId = "help",
+            #   label = icon("info-circle", class = "fa-2x"),
+            #   style = "background: transparent; border: none; color: #ffffff; cursor: pointer;"
+            # )
           ),
           fluidPage(
             br(),
             introBox(
-              uiOutput("logo"),
-              #htmlOutput("title"),
-              data.step = 1,
-              data.intro = "AjustAI é uma ferramenta calculadora de dados de sobrevida."
+              id="step1_1",
+              uiOutput("logo")
             ),
             br(),
-            tabsetPanel(
+            tabsetPanel(id="abas",
               tabPanel(
                 introBox(
-                  "Dados",
-                  data.step = 2,
-                  data.intro = "Esta seção é utilizada para simular os dados individualizados (IPD) a partir de dados agregados obtidos de gráficos curvas de Kaplan-Meier."
+                  id="step1_2",
+                  "Dados"
                 ),
                 br(),
-                htmlOutput("title1",align="left"),
-                htmlOutput("description1",align="left"),
-                hr(),
+                fluidPage(
+                  column(width = 10,
+                    fluidRow(
+                      htmlOutput("title1",align="left"),
+                      htmlOutput("description1",align="left")
+                    )
+                  ),
+                  column(width = 2,
+                    fluidRow(
+                      style = "background-color: transparent; height: 60px; display: flex; justify-content: flex-end; align-items: center; padding-right: 0px;margin-top:-260px;margin-right:-50px",
+                      actionButton(
+                        inputId = "help",
+                        label = icon("info-circle", class = "fa-2x"),
+                        style = "background: transparent; border: none; color: #ffffff; cursor: pointer;"
+                      )
+                    ),
+                  )
+                ),
+                br(),
                 column(width = 3,
                   introBox(
-                    box(width = 12,height = 600,
+                    id="step1_5",
+                    box(width = 12,height = 600,title = "Configurações",solidHeader = TRUE,status = "primary",
                       h5("Selecione um arquivo com tempo e sobrevida"),
                       introBox(
-                        radioButtons("format","Formato do arquivo",choices = c("Excel (.xls, .xslx)","csv"),selected = "csv"),
-                        data.step = 6,
-                        data.intro = "Para o arquivos do formato csv, você precisa configurar se a primeira linha 
-                        contém o título das variáveis, marcando a opção 'Rótulo de variáveis' e o tipo de separador 
-                        dos dados (vírgula, ponto e vírgula ou tab)."
+                        id="step1_6",
+                        radioButtons("format","Formato do arquivo",choices = c("Excel (.xls, .xslx)","csv"),selected = "csv")
                       ),
                       conditionalPanel(condition = "input.format=='csv'",
                                        checkboxInput("header", "Rótulo das variáveis", TRUE),
@@ -124,41 +137,30 @@ ui <- dashboardPage(skin = "black",
                       fileInput("file", label = NULL,accept = c(".csv",".xlsx",".xls"),
                                 buttonLabel="Buscar",placeholder = "Nenhum arquivo selecionado"),
                       introBox(
-                        uiOutput("var_select_ui"),
-                        data.step = 7,
-                        data.intro = "Selecione as respectivas variáveis de tempo e sobrevida do seu banco de dados."
+                        id="step1_7",
+                        uiOutput("var_select_ui")
                       ),
                       introBox(
-                        actionButton("preview","Pré-visualizar dados"),
-                        data.step = 8,
-                        data.intro = "Após carregar o arquivo, é possível checar se está sendo lido corretamente 
-                        clicando na opção 'Pré-visualizar dados'."
+                        id="step1_8",
+                        actionButton("preview","Pré-visualizar dados")
                       )
-                    ),
-                    data.step = 5,
-                    data.intro = "Nesta opção você carrega o arquivo contendo dados com o tempo e sobrevida. 
-                    Este arquivo pode ser do formato Excel (xlsx) ou csv. Importante notar que estas configurações 
-                    são essenciais para que o arquivo seja carregado corretamente."
+                    )
                   )
                 ),
                 column(width = 9,
-                  box(width = 12,height = 600,
+                  box(width = 12,height = 600,title = "Resultados",solidHeader = TRUE,status = "primary",
                     fluidPage(
                       column(4,
                         introBox(
-                          div(style = "overflow-y:scroll;", dataTableOutput("table", height = 550,width = 250)),
-                          data.step = 9,
-                          data.intro = "Aqui você irá pré-visualizar os dados após carregados."
+                          id="step1_9",
+                          div(style = "overflow-y:scroll;", dataTableOutput("table", height = 550,width = 250))
                         )
                       ),
                       column(8,
                           h4("Possui vetor de tempos e número de pessoas sob risco em cada tempo?"),
                         introBox(
-                          radioButtons("n_t_risk",label = NULL,choices = c("Sim","Não"),selected = "Sim",inline = T),
-                          data.step = 10,
-                          data.intro = "Selecione se possui informações sobre o número de pessoas sob risco em cada tempo. 
-                          Caso contrário, deverá informar o número total de pessoa sob risco e o algorítmo irá fornecer uma aproximação baseada 
-                          nos dados carregados."
+                          id="step1_10",
+                          radioButtons("n_t_risk",label = NULL,choices = c("Sim","Não"),selected = "Sim",inline = T)
                         ),
                         conditionalPanel(condition = "input.n_t_risk=='Sim'",
                           h4("Informar um cojunto de dados contendo os tempos de coleta de dados dispostos no gráfico"),
@@ -173,11 +175,8 @@ ui <- dashboardPage(skin = "black",
                         ),
                         br(),
                         introBox(
-                          actionButton("run_codes","Gerar dados individualizados"),
-                          data.step = 11,
-                          data.intro = "Após carregar os dados e checar que está carregado corretamente. E,
-                          após informar os vetores com o tempo e o número de pessoas sob risco, clicar 
-                          neste botão para gerar os dados individualizados."
+                          id="step1_11",
+                          actionButton("run_codes","Gerar dados individualizados")
                         ),
                         br(),
                         br(),
@@ -194,51 +193,97 @@ ui <- dashboardPage(skin = "black",
               ),
               tabPanel(
                 introBox(
-                  "Ajuste",
-                  data.step = 3,
-                  data.intro = "Esta seção é utilizada realizar o ajuste de distribuições de sobrevivência paramétricas."
+                  id="step1_3",
+                  "Ajuste"
                 ),
                 br(),
-                htmlOutput("title2",align="left"),
-                htmlOutput("description2",align="left"),
-                hr(),
+                fluidPage(
+                  column(width = 10,
+                    introBox(
+                      id="step2_1",
+                      fluidRow(
+                        htmlOutput("title2",align="left"),
+                        htmlOutput("description2",align="left")
+                      )
+                    )
+                  ),
+                  column(width = 2,
+                    fluidRow(
+                      style = "background-color: transparent; height: 60px; display: flex; justify-content: flex-end; align-items: center; padding-right: 0px;margin-top:-260px;margin-right:-50px",
+                      actionButton(
+                        inputId = "help2",
+                        label = icon("info-circle", class = "fa-2x"),
+                        style = "background: transparent; border: none; color: #ffffff; cursor: pointer;"
+                      )
+                    ),
+                  )
+                ),
+                br(),
                 column(width = 3,
-                  box(width = 12,height = 600,
-                    radioButtons("manter","Carregar o arquivo da aba anterior",choices = c("Sim","Não"),inline = T,selected = "Não"),
-                    conditionalPanel(condition = "input.manter=='Não'",
-                       h5("Selecione o arquivo contendo os dados individualizados"),
-                       radioButtons("format2","Formato do arquivo",choices = c("Excel (.xls, .xslx)","csv"),selected = "csv"),
-                       conditionalPanel(condition = "input.format2=='csv'",
-                                        checkboxInput("header2", "Rótulo das variáveis", TRUE),
-                                        radioButtons("sep2","Separador",choices=c("Vírgula"=",","Ponto e vírgula"=";","Tab"="\t"),selected=";")
-                       ),
-                       fileInput("file2", label = NULL,accept = c(".csv",".xlsx",".xls"),
-                                 buttonLabel="Buscar",placeholder = "Nenhum arquivo selecionado"),
-                       uiOutput("var_select_ui2")
-                    ),
-                    column(width = 4,
-                      actionButton("preview2","Visualizar dados")
-                    ),
-                    column(width = 2),
-                    column(width = 4,
-                      actionButton("run_codes2","Executar análises")
+                  introBox(
+                    id="step2_2",
+                    box(width = 12,height = 670,title = "Configurações",solidHeader = TRUE,status = "primary",
+                      introBox(
+                        id="step2_3",
+                        radioButtons("manter","Carregar o arquivo da aba anterior",choices = c("Sim","Não"),inline = T,selected = "Não")
+                      ),
+                      conditionalPanel(condition = "input.manter=='Não'",
+                         h5("Selecione o arquivo contendo os dados individualizados"),
+                         introBox(
+                           id="step2_4",
+                           radioButtons("format2","Formato do arquivo",choices = c("Excel (.xls, .xslx)","csv"),selected = "csv")
+                         ),
+                         conditionalPanel(condition = "input.format2=='csv'",
+                                          checkboxInput("header2", "Rótulo das variáveis", TRUE),
+                                          radioButtons("sep2","Separador",choices=c("Vírgula"=",","Ponto e vírgula"=";","Tab"="\t"),selected=";")
+                         ),
+                         fileInput("file2", label = NULL,accept = c(".csv",".xlsx",".xls"),
+                                   buttonLabel="Buscar",placeholder = "Nenhum arquivo selecionado"),
+                         introBox(
+                           id="step2_5",
+                           uiOutput("var_select_ui2")
+                         )
+                      ),
+                      column(width = 4,
+                        introBox(
+                          id="step2_6",
+                          actionButton("preview2","Visualizar dados")
+                        )
+                      ),
+                      column(width = 2),
+                      column(width = 4,
+                        introBox(
+                          id="step2_7",
+                          actionButton("run_codes2","Executar análises")
+                        )
+                      )
                     )
                   )
                 ),
                 column(width = 9,
-                  box(width = 12,
+                  box(width = 12,height = 670,title = "Resultados",solidHeader = TRUE,status = "primary",
                     tabsetPanel(
-                      tabPanel("Dados e curva",
+                      tabPanel(
+                        introBox(
+                          id="step2_8",
+                          "Dados e curva"
+                        ),
                         fluidPage(
                           column(width = 4,
                             br(),
-                            div(style = "overflow-y:scroll;", dataTableOutput("table2", height = 550,width = 250))
+                            introBox(
+                              id="step2_12",
+                              div(style = "overflow-y:scroll;", dataTableOutput("table2", height = 500,width = 250))
+                            )
                           ),
                           column(width = 8,
                             h3("Curva de Kaplan-Meier"),
                             fluidRow(
                               column(6,
-                                radioButtons("add_curves","Adicionar curvas estimadas",choices=c("Sim","Não"),selected = "Não",inline = T)
+                                introBox(
+                                  id="step2_13",
+                                  radioButtons("add_curves","Adicionar curvas estimadas",choices=c("Sim","Não"),selected = "Não",inline = T)
+                                )
                               ),
                               conditionalPanel(condition = "input.add_curves=='Sim'",
                                 column(6,
@@ -248,28 +293,39 @@ ui <- dashboardPage(skin = "black",
                             ),
                             br(),
                             fluidRow(
-                              withSpinner(plotlyOutput("plot1", width = 'auto', height = 450), type = 2)
+                              withSpinner(plotlyOutput("plot1", width = 'auto', height = 400), type = 2)
                             )
-                            
                           )
                         )
                       ),
-                      tabPanel("Parâmetros ajustados",
+                      tabPanel(
+                        introBox(
+                          id="step2_9",
+                          "Parâmetros ajustados"
+                        ),
                         fluidPage(
                           br(),
                           h4("Estimativas dos parâmetros para modelos de sobrevivência por tipo de distribuição."),
                           br(),
-                          div(style = "overflow:scroll;", dataTableOutput("table3", height = 500,width = "100%"))
+                          dataTableOutput("table3", height = 500,width = "100%")
                         )
                       ),
-                      tabPanel("Qualidade do ajuste",
+                      tabPanel(
+                        introBox(
+                          id="step2_10",
+                          "Qualidade do ajuste"
+                        ),
                         fluidPage(
                           br(),
                           h4("Qualidade de ajuste dos modelos de sobrevivência ajustados."),
-                          div(style = "overflow:scroll;", dataTableOutput("table4", height = 550,width = "100%"))
+                          dataTableOutput("table4", height = 500,width = "100%")
                         )
                       ),
-                      tabPanel("Dados para MC multivariado",
+                      tabPanel(
+                        introBox(
+                          id="step2_11",
+                          "Dados para MC multivariado"
+                        ),
                         fluidPage(
                           h4("Selecione o modelo para ajustar o MC multivariado"),
                           selectInput("model",label = NULL,choices=c("Exponential", "Weibull", "Loglogistic",
@@ -277,11 +333,11 @@ ui <- dashboardPage(skin = "black",
                           br(),
                           column(width = 6,
                              h4(htmlOutput("title_table5.1")),
-                             div(style = "overflow:scroll;", dataTableOutput("table5.1", height = 550,width = "100%"))
+                             dataTableOutput("table5.1", height = 200,width = "100%")
                           ),
                           column(width = 6,
                              h4(htmlOutput("title_table5.2")),
-                             div(style = "overflow:scroll;", dataTableOutput("table5.2", height = 550,width = "100%"))
+                             dataTableOutput("table5.2", height = 200,width = "100%")
                           )
                         )
                       )
@@ -291,10 +347,53 @@ ui <- dashboardPage(skin = "black",
               ),
               tabPanel(
                 introBox(
-                  "Ajuda",
-                  data.step = 4,
-                  data.intro = "Nesta seção contém maiores detalhes sobre a metodologia da ferramenta."
+                  id="step1_4",
+                  "Ajuda"
                 ),
+                br(),
+                fluidRow(
+                  htmlOutput("title3",align="left"),
+                  htmlOutput("description3",align="left"),
+                  br(),
+                  br(),
+                  htmlOutput("subtitle3",align="left"),
+                  br(),
+                  bsCollapse(
+                    id = "detalhes",
+                    bsCollapsePanel(
+                      title = htmlOutput("q1"),
+                      htmlOutput("a1")
+                    ),
+                    bsCollapsePanel(
+                      title = htmlOutput("q2"),
+                      htmlOutput("a2")
+                    ),
+                    bsCollapsePanel(
+                      title = htmlOutput("q3"),
+                      htmlOutput("a3")
+                    ),
+                    bsCollapsePanel(
+                      title = htmlOutput("q4"),
+                      htmlOutput("a4")
+                    ),
+                    bsCollapsePanel(
+                      title = htmlOutput("q5"),
+                      htmlOutput("a5")
+                    ),
+                    bsCollapsePanel(
+                      title = htmlOutput("q6"),
+                      htmlOutput("a6")
+                    ),
+                    bsCollapsePanel(
+                      title = htmlOutput("q7"),
+                      htmlOutput("a7")
+                    ),
+                    bsCollapsePanel(
+                      title = htmlOutput("q8"),
+                      htmlOutput("a8")
+                    )
+                  )
+                )
               )
             )
           )
@@ -310,12 +409,63 @@ server <- shinyServer(function(input, output, session) {
   hintjs(session, options = list("hintButtonLabel"="Espero que este tutorial seja útil"),
          events = list("onhintclose"=I('alert("Wasn\'t that hint helpful")')))
   
-  observeEvent(input$help,
-               introjs(session, options = list("nextLabel"="Próximo",
-                                               "prevLabel"="Anterior",
-                                               "skipLabel"="Fechar"),
-                       events = list("oncomplete"=I('alert("Tutorial concluído")')))
-  )
+  observeEvent(input$help, {
+    introjs(session, options = list(
+      nextLabel = "Próximo",
+      prevLabel = "Anterior",
+      skipLabel = "Fechar",
+      steps = list(
+        list(element = "#step1_1", intro = "Ajustaí é uma ferramenta calculadora de dados de sobrevida."),
+        list(element = "#step1_2", intro = "Esta seção é utilizada para simular os dados individualizados (IPD) a partir de dados agregados obtidos de gráficos curvas de Kaplan-Meier."),
+        list(element = "#step1_3", intro = "Esta seção é utilizada realizar o ajuste de distribuições de sobrevivência paramétricas."),
+        list(element = "#step1_4", intro = "Nesta seção contém maiores detalhes sobre a metodologia da ferramenta."),
+        list(element = "#step1_5", intro = "Nesta opção você carrega o arquivo contendo dados com o tempo e sobrevida. 
+                    Este arquivo pode ser do formato Excel (xlsx) ou csv. Importante notar que estas configurações 
+                    são essenciais para que o arquivo seja carregado corretamente."),
+        list(element = "#step1_6", intro = "Para o arquivos do formato csv, você precisa configurar se a primeira linha 
+                        contém o título das variáveis, marcando a opção 'Rótulo de variáveis' e o tipo de separador 
+                        dos dados (vírgula, ponto e vírgula ou tab)."),
+        list(element = "#step1_7", intro = "Selecione as respectivas variáveis de tempo e sobrevida do seu banco de dados."),
+        list(element = "#step1_8", intro = "Após carregar o arquivo, é possível checar se está sendo lido corretamente 
+                        clicando na opção 'Pré-visualizar dados'."),
+        list(element = "#step1_9", intro = "Aqui você irá pré-visualizar os dados após carregados."),
+        list(element = "#step1_10", intro = "Selecione se possui informações sobre o número de pessoas sob risco em cada tempo. 
+                          Caso contrário, deverá informar o número total de pessoa sob risco e o algorítmo irá fornecer uma aproximação baseada 
+                          nos dados carregados."),
+        list(element = "#step1_11", intro = "Após carregar os dados e checar que está carregado corretamente. E,
+                          após informar os vetores com o tempo e o número de pessoas sob risco, clicar 
+                          neste botão para gerar os dados individualizados.")
+      )
+    ))
+  })
+  
+  observeEvent(input$help2, {
+    introjs(session, options = list(
+      nextLabel = "Próximo",
+      prevLabel = "Anterior",
+      skipLabel = "Fechar",
+      steps = list(
+        list(element = "#step2_1", intro = "Essa seção permite realizar os ajustes das curvas a partir dos dados individualizados carregados."),
+        list(element = "#step2_2", intro = "Nesta opção você carrega o arquivo contendo dados com o tempo e sobrevida. 
+                    Este arquivo pode ser do formato Excel (xlsx) ou csv. Importante notar que estas configurações 
+                    são essenciais para que o arquivo seja carregado corretamente."),
+        list(element = "#step2_3", intro = "Se deseja utilizar os dados gerados pela seção anterior, marque a opção 'Sim', caso contrário, marque a opção 'Não' e carregue um arquivo individualizado."),
+        list(element = "#step2_4", intro = "Para o arquivos do formato csv, você precisa configurar se a primeira linha 
+                        contém o título das variáveis, marcando a opção 'Rótulo de variáveis' e o tipo de separador 
+                        dos dados (vírgula, ponto e vírgula ou tab)."),
+        list(element = "#step2_5", intro = "Selecione as respectivas variáveis de tempo e sobrevida do seu banco de dados."),
+        list(element = "#step2_6", intro = "Após carregar o arquivo, é possível checar se está sendo lido corretamente 
+                        clicando na opção 'Pré-visualizar dados'."),
+        list(element = "#step2_7", intro = "Clique neste botão para executar as análises. Só é ativado após clicar para pré-visualizar os dados."),
+        list(element = "#step2_8", intro = "Seção de visualização dos dados e curva Kaplan-Meier e as curvas estimadas dos modelos paramétricos."),
+        list(element = "#step2_9", intro = "Seção de visualização dos parâmetros dos modelos ajustados."),
+        list(element = "#step2_10", intro = "Seção de visualização da qualidade de ajuste dos modelos ajustados."),
+        list(element = "#step2_11", intro = "Seção de visualização dos parâmetros de Monte Carlo Multivariado."),
+        list(element = "#step2_12", intro = "Aqui você irá pré-visualizar os dados após carregados."),
+        list(element = "#step2_13", intro = "Esta opção te permite adicionar as curvas dos modelos ajustados no gráfico de Kaplan-Meier. É possível customizar o horizonte de tempo para as curvas.")
+      )
+    ))
+  })
   
   observe({
     # Pega os vetores como strings
@@ -450,6 +600,154 @@ server <- shinyServer(function(input, output, session) {
     
     HTML(htmlText)
     
+  })
+  
+  output$title3 <- renderUI({
+    
+    htmlText = paste("<div style='font-weight: bold;font-size: 24px;color: #414141;margin-left: 30px;'>","Sobre Ajustaí","</div>")
+    HTML(htmlText)
+  })
+  
+  output$description3 <- renderUI({
+    htmlText = paste("<div style='font-size: 18px;color: #414141;margin-left: 30px;margin-right: 30px;text-align:justify'>",
+                     "Ajustaí é uma ferramenta online desenvolvida para facilitar a análise de sobrevida 
+                     sem a necessidade de conhecimentos em programação. Por meio do carregamento de 
+                     arquivos em formato .csv ou .xlsx, é possível gerar curvas de Kaplan-Meier 
+                     e ajustar modelos paramétricos clássicos (Exponencial, Weibull, Log-normal, Log-Logística, Gamma Generalizada e Gompertz). 
+                     Esta ferramenta permite visualizar os dados carregados, estimativas gráficas das curvas 
+                     de sobrevida, avaliação da qualidade do ajuste dos modelos e extração dos parâmetros 
+                     estimados para uso em outras aplicações.",
+                     "</div>")
+    
+    HTML(htmlText)
+    
+  })
+  
+  output$subtitle3 <- renderUI({
+    
+    htmlText = paste("<div style='font-weight: bold;font-size: 24px;color: #414141;margin-left: 30px;'>","Perguntas frequentes","</div>")
+    HTML(htmlText)
+  })
+  
+  output$q1 <- renderUI({
+    
+    htmlText = paste("<div style='font-weight: bold;font-size: 18px;color: #414141;margin-left: 50px;'>","•	Que tipo de arquivo posso carregar (formato, separador, estrutura)?","</div>")
+    HTML(htmlText)
+  })
+  
+  output$q2 <- renderUI({
+    
+    htmlText = paste("<div style='font-weight: bold;font-size: 18px;color: #414141;margin-left: 50px;'>","•	Quais colunas devem estar presentes no meu arquivo de entrada?","</div>")
+    HTML(htmlText)
+  })
+  
+  output$q3 <- renderUI({
+    
+    htmlText = paste("<div style='font-weight: bold;font-size: 18px;color: #414141;margin-left: 50px;'>","•	O que significa 'vetor de tempos de coleta'?","</div>")
+    HTML(htmlText)
+  })
+  
+  output$q4 <- renderUI({
+    
+    htmlText = paste("<div style='font-weight: bold;font-size: 18px;color: #414141;margin-left: 50px;'>","•	Como devo informar o número de pessoas sob risco em cada tempo?","</div>")
+    HTML(htmlText)
+  })
+  
+  output$q5 <- renderUI({
+    
+    htmlText = paste("<div style='font-weight: bold;font-size: 18px;color: #414141;margin-left: 50px;'>","•	O que acontece se eu não tiver os vetores de tempo e risco?","</div>")
+    HTML(htmlText)
+  })
+  
+  output$q6 <- renderUI({
+    
+    htmlText = paste("<div style='font-weight: bold;font-size: 18px;color: #414141;margin-left: 50px;'>","•	A ferramenta aceita dados com censura explícita?","</div>")
+    HTML(htmlText)
+  })
+  
+  output$q7 <- renderUI({
+    
+    htmlText = paste("<div style='font-weight: bold;font-size: 18px;color: #414141;margin-left: 50px;'>","•	Posso exportar os resultados da análise?","</div>")
+    HTML(htmlText)
+  })
+  
+  output$q8 <- renderUI({
+    
+    htmlText = paste("<div style='font-weight: bold;font-size: 18px;color: #414141;margin-left: 50px;'>","•	A ferramenta ajusta modelos paramétricos automaticamente?","</div>")
+    HTML(htmlText)
+  })
+  
+  output$a1 <- renderUI({
+    
+    htmlText = paste("<div style='font-size: 16px;color: #414141;margin-left: 50px;'>",
+                     "Você pode carregar arquivos nos formatos .csv ou .xlsx. Para arquivos .csv, é 
+                     possível configurar o separador como vírgula (,), ponto e vírgula (;) ou tabulação 
+                     (\t). A ferramenta permite indicar se a primeira linha do arquivo contém os nomes 
+                     das variáveis (cabeçalho). A estrutura deve seguir um formato tabular (colunas com 
+                     variáveis e linhas com observações).","</div>")
+    HTML(htmlText)
+  })
+  
+  output$a2 <- renderUI({
+    
+    htmlText = paste("<div style='font-size: 16px;color: #414141;margin-left: 50px;'>",
+                     "Seu arquivo deve conter, no mínimo uma coluna com os tempos de sobrevivência ou coleta 
+                     e uma coluna indicando o status do evento (1 para evento ocorrido, 0 para censura).","</div>")
+    HTML(htmlText)
+  })
+  
+  output$a3 <- renderUI({
+    
+    htmlText = paste("<div style='font-size: 16px;color: #414141;margin-left: 50px;'>",
+                     "É a sequência dos tempos nos quais foram registrados eventos (morte, falha, etc.) 
+                     ou censuras. Em dados individuais, cada linha traz o tempo de cada sujeito. 
+                     Em dados agregados, são os pontos de tempo onde se observou o número de eventos 
+                     e o número sob risco.","</div>")
+    HTML(htmlText)
+  })
+  
+  output$a4 <- renderUI({
+    
+    htmlText = paste("<div style='font-size: 16px;color: #414141;margin-left: 50px;'>",
+                     "Se você estiver utilizando dados agregados, inclua uma coluna com os números sob 
+                     risco correspondentes a cada tempo. Em dados individuais, essa informação será inferida 
+                     automaticamente pela ferramenta com base no tempo de entrada e censura/evento de cada sujeito.","</div>")
+    HTML(htmlText)
+  })
+  
+  output$a5 <- renderUI({
+    
+    htmlText = paste("<div style='font-size: 16px;color: #414141;margin-left: 50px;'>",
+                     "Se você não informar os vetores de tempo ou o número sob risco, deverá fornecer ao menos 
+                     o número total de indivíduos e então a ferramenta irá calcular uma aproximação dos vetores 
+                     de tempo e do status do evento.","</div>")
+    HTML(htmlText)
+  })
+  
+  output$a6 <- renderUI({
+    
+    htmlText = paste("<div style='font-size: 16px;color: #414141;margin-left: 50px;'>",
+                     "Sim. A ferramenta aceita censura à direita (mais comum). Para isso, 
+                     você deve usar uma coluna de status com 1 para eventos observados (ex: morte) 
+                     e 0 para censura (ex: paciente ainda vivo ao final do acompanhamento).","</div>")
+    HTML(htmlText)
+  })
+  
+  output$a7 <- renderUI({
+    
+    htmlText = paste("<div style='font-size: 16px;color: #414141;margin-left: 50px;'>",
+                     "Sim. A ferramenta permite copiar os dados ou exportar os parâmetros dos modelos 
+                     ajustados e as tabelas de resumo em formato .csv, .xlsx e .pdf.","</div>")
+    HTML(htmlText)
+  })
+  
+  output$a8 <- renderUI({
+    
+    htmlText = paste("<div style='font-size: 16px;color: #414141;margin-left: 50px;'>",
+                     "Sim. Após carregar os dados, você poderá escolher quais modelos paramétricos 
+                     ajustar. A ferramenta estima os parâmetros automaticamente e apresenta curvas 
+                     e métricas de qualidade do ajuste (como AIC e BIC).","</div>")
+    HTML(htmlText)
   })
   
   output$title_table5.1 <- renderUI({
@@ -708,7 +1006,8 @@ server <- shinyServer(function(input, output, session) {
                        buttons = c('copy', 'csv', 'excel', 'pdf'))
     
     if(!is.null(input$file) & input$manter=="Sim"){
-      df=database2()
+      df=database2() %>% 
+        dplyr::select(-treat)
     } else{
       df=data.frame(time=database2()[,input$var3],status=database2()[,input$var4])
       
@@ -1153,9 +1452,6 @@ server <- shinyServer(function(input, output, session) {
   fit_data <- reactive({
     req(input$run_codes)
     
-    #trisk2 <- c(0,12,18,24,36,48,60,72,84,96)
-    #nrisk2 <- c(103,90,80,72,49,39,29,21,14,2)
-    
     df=data.frame(tempo=database()[,input$var1],sobrevida=database()[,input$var2])
     
     if(any(str_detect(df$tempo,","))==TRUE){
@@ -1311,23 +1607,6 @@ server <- shinyServer(function(input, output, session) {
     
     Gompertz <- flexsurvreg(Surv(time, status)~1,data=df, dist="gompertz")
   })
-  
-  # output$save <- downloadHandler(
-  #   
-  #   filename = function() {
-  #     paste0("file.csv")
-  #   },
-  #   
-  #   content = function(file) {
-  #     
-  #     write.csv(fit_data(),file, row.names = FALSE)
-  #     
-  #     # switch (input$format6,
-  #     #         ".csv" = write.csv2(df, file,row.names = FALSE),
-  #     #         ".xlsx" = write.xlsx(df,file)
-  #     # )
-  #   }
-  # )
   
 })
 
