@@ -163,7 +163,7 @@ ui <- dashboardPage(skin = "black",
                           radioButtons("n_t_risk",label = NULL,choices = c("Sim","Não"),selected = "Sim",inline = T)
                         ),
                         conditionalPanel(condition = "input.n_t_risk=='Sim'",
-                          h4("Informar um cojunto de dados contendo os tempos de coleta de dados dispostos no gráfico"),
+                          h4("Informar um conjunto de dados contendo os tempos de coleta de dados dispostos no gráfico"),
                           textInput("trisk",label = NULL,value = NULL,placeholder = "Informe o vetor de tempos de coleta separados por vírgula"),
                           br(),
                           h4("Informar um conjunto de dados contendo os números de pessoas sob risco em cada tempo"),
